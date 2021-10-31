@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Header } from '../components/Header';
@@ -8,29 +8,32 @@ import { TodoInput } from '../components/TodoInput';
 export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  function handleAddTask(newTaskTitle: string) {
+  const handleAddTask = useCallback((newTaskTitle: string) => {
     const data =  {
       id: new Date().getTime(),
       title: newTaskTitle,
       done: false
     }
     setTasks(prevState => [...prevState, data])
-  }
+  }, [setTasks])
 
-  function handleToggleTaskDone(id: number) {
-    const task = tasks.find(task => task.id === id)
-    if (!task || task.done) return 
+  const handleToggleTaskDone = useCallback((id: number) => {
+    let data = tasks;
 
-    task.done = true
+    const updatedTasks = data.map(task => {
+      if (task.id === id) {
+        task.done = true
+      }
+      return task
+    })
 
-    const data = tasks.filter(task => task.id !== id)
-    setTasks([...data, task])
-  }
+    setTasks(updatedTasks)
+  }, [tasks, setTasks]) 
 
-  function handleRemoveTask(id: number) {
+  const handleRemoveTask = useCallback((id: number) => {
     const data = tasks.filter(task => task.id !== id)
     setTasks(data)
-  }
+  }, [tasks, setTasks])
 
   return (
     <View style={styles.container}>
